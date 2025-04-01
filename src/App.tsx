@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { Settings, Palette, Type, Layout, Circle, Box, Sliders, Download } from 'lucide-react';
+import { Settings, Palette, Type, Layout, Circle, Box, Sliders, Download, ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
 import { getFontsUrl } from './api/fonts';
 import { defaultConfig } from './defaultConfig';
 import { ThemeConfig } from './types';
 import { Navigation } from './components/Navigation';
+import { StepIndicator } from './components/StepIndicator';
 import { FontsStep } from './steps/FontsStep';
 import { BreakpointsStep } from './steps/BreakpointsStep';
 import { ColorsStep } from './steps/ColorsStep';
@@ -16,6 +17,8 @@ function App() {
   const [currentStep, setCurrentStep] = useState(1);
   const [config, setConfig] = useState<ThemeConfig>(defaultConfig);
   const [showGenerateModal, setShowGenerateModal] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(true);
 
   const steps = [
     { icon: Type, component: FontsStep, title: 'Fonts' },
@@ -416,67 +419,158 @@ input[type="radio"]:checked {
         </div>
       )}
 
-      <div className="flex h-screen">
-        {/* Left Column - Steps */}
-        <div className="w-1/4 border-r border-gray-200 bg-white p-6 overflow-y-auto">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Theme Generator</h2>
-          <div className="space-y-2">
-            {steps.map((step, index) => {
-              const StepIcon = step.icon;
-              return (
-                <button
-                  key={step.title}
-                  onClick={() => setCurrentStep(index + 1)}
-                  className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-colors ${
-                    currentStep === index + 1
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'hover:bg-gray-50 text-gray-600'
-                  }`}
-                >
-                  <StepIcon className="w-5 h-5" />
-                  <span className="font-medium">{step.title}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+      {/* Mobile Sidebar Toggle */}
+      <button 
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="fixed top-4 left-4 z-50 md:hidden p-2 bg-white rounded-lg shadow-md text-gray-700"
+        aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+      >
+        {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
 
-        {/* Middle Column - Current Step */}
-        <div className="w-1/2 p-6 overflow-y-auto">
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Icon className="w-6 h-6 text-blue-600" />
+      <div className="flex flex-col md:flex-row h-screen">
+        {/* Left Sidebar - Steps */}
+        <aside className={`fixed md:static inset-y-0 left-0 z-40 w-64 md:w-80 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 bg-white border-r border-gray-200 overflow-y-auto custom-scrollbar`}>
+          <div className="p-6 flex flex-col h-full">
+            {/* Logo Area */}
+            <div className="flex justify-center mb-6">
+              <div className="w-36 h-12 bg-gray-100 rounded-md flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                  <path d="M2 12C2 6.5 6.5 2 12 2a10 10 0 0 1 8 4"></path>
+                  <path d="M5 19.5C5.5 18 6 15 6 12c0-.7.12-1.37.34-2"></path>
+                  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"></path>
+                  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"></path>
+                  <path d="M8.65 22c.21-.66.45-1.32.57-2"></path>
+                  <path d="M14 13.12c0 2.38 0 6.38-1 8.88"></path>
+                  <path d="M2 16h.01"></path>
+                  <path d="M21.8 16c.2-2 .131-5.354 0-6"></path>
+                  <path d="M9 6.8a6 6 0 0 1 9 5.2c0 .47 0 1.17-.02 2"></path>
+                </svg>
+                <span className="text-blue-600 text-xl font-bold ml-2">ThemeGen</span>
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {steps[currentStep - 1].title}
-              </h1>
             </div>
-
-            <CurrentStepComponent
-              config={config}
-              setConfig={setConfig}
-              onNext={handleNext}
-              onPrev={handlePrev}
-              currentStep={currentStep}
-              totalSteps={steps.length}
-            />
-
-            <Navigation
-              onNext={handleNext}
-              onPrev={handlePrev}
-              onGenerate={handleGenerateCSS}
-              currentStep={currentStep}
-              totalSteps={steps.length}
-            />
+            
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Theme Generator</h2>
+            <div className="space-y-2">
+              {steps.map((step, index) => {
+                const StepIcon = step.icon;
+                return (
+                  <button
+                    key={step.title}
+                    onClick={() => {
+                      setCurrentStep(index + 1);
+                      if (window.innerWidth < 768) {
+                        setSidebarOpen(false);
+                      }
+                    }}
+                    className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-colors ${
+                      currentStep === index + 1
+                        ? 'bg-blue-50 text-blue-700'
+                        : 'hover:bg-gray-50 text-gray-600'
+                    }`}
+                  >
+                    <StepIcon className="w-5 h-5" />
+                    <span className="font-medium">{step.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+            
+            {/* Copyright Text - At Bottom */}
+            <div className="mt-auto pt-6 text-center text-gray-500 text-sm">
+              <div className="flex items-center justify-center gap-1">
+                <span>made with</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#f43f5e" stroke="#f43f5e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                </svg>
+                <span>by</span>
+              </div>
+              <div className="font-medium mt-1">
+                Miguel Lobo
+              </div>
+            </div>
           </div>
-        </div>
+        </aside>
 
-        {/* Right Column - Preview */}
-        <div className="w-1/4 border-l border-gray-200 bg-white p-6 overflow-y-auto">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Live Preview</h2>
-          {PreviewContent}
-        </div>
+        {/* Main Content Area */}
+        <main className="flex flex-col md:flex-row flex-1 overflow-hidden">
+          {/* Content Column */}
+          <div className={`flex-1 p-4 md:p-6 ${!previewOpen ? 'w-full' : ''} overflow-y-auto custom-scrollbar`}>
+            <div className="pt-10 md:pt-0">
+              <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
+                {/* Step Indicator - Only on larger screens */}
+                <div className="hidden md:block">
+                  <StepIndicator
+                    currentStep={currentStep}
+                    totalSteps={steps.length}
+                  />
+                </div>
+                
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <Icon className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <h1 className="text-xl md:text-2xl font-bold text-gray-900">
+                    {steps[currentStep - 1].title}
+                  </h1>
+                  
+                  {/* Preview Toggle on Mobile/Tablet */}
+                  <button
+                    onClick={() => setPreviewOpen(!previewOpen)}
+                    className="ml-auto md:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                    aria-label={previewOpen ? "Hide preview" : "Show preview"}
+                  >
+                    {previewOpen ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+                  </button>
+                </div>
+
+                <CurrentStepComponent
+                  config={config}
+                  setConfig={setConfig}
+                  onNext={handleNext}
+                  onPrev={handlePrev}
+                  currentStep={currentStep}
+                  totalSteps={steps.length}
+                />
+
+                <Navigation
+                  onNext={handleNext}
+                  onPrev={handlePrev}
+                  onGenerate={handleGenerateCSS}
+                  currentStep={currentStep}
+                  totalSteps={steps.length}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Preview Column */}
+          <aside 
+            className={`
+              ${previewOpen ? 'translate-x-0' : 'translate-x-full'} 
+              transition-transform duration-300 
+              fixed md:static md:translate-x-0 inset-y-0 right-0 z-30
+              w-full md:w-80 lg:w-96 xl:w-[30rem]
+              bg-white border-l border-gray-200 overflow-y-auto custom-scrollbar
+            `}
+          >
+            <div className="sticky top-0 z-10 flex items-center justify-between p-4 md:p-6 bg-white border-b border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900">Live Preview</h2>
+              
+              {/* Preview Toggle on Desktop */}
+              <button
+                onClick={() => setPreviewOpen(!previewOpen)}
+                className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                aria-label="Toggle preview panel"
+              >
+                {previewOpen ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+              </button>
+            </div>
+            <div className="p-4 md:p-6">
+              {PreviewContent}
+            </div>
+          </aside>
+        </main>
       </div>
     </div>
   );
