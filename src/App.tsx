@@ -434,7 +434,7 @@ input[type="radio"]:checked {
           <div className="p-6 flex flex-col h-full">
             {/* Logo Area */}
             <div className="flex justify-center mb-6">
-              <div className="w-36 h-12 bg-gray-100 rounded-md flex items-center justify-center">
+              <div className="w-36 h-12 rounded-md flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
                   <path d="M2 12C2 6.5 6.5 2 12 2a10 10 0 0 1 8 4"></path>
                   <path d="M5 19.5C5.5 18 6 15 6 12c0-.7.12-1.37.34-2"></path>
@@ -449,8 +449,7 @@ input[type="radio"]:checked {
                 <span className="text-blue-600 text-xl font-bold ml-2">ThemeGen</span>
               </div>
             </div>
-            
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Theme Generator</h2>
+            <hr className="border-gray-200 mb-4" />
             <div className="space-y-2">
               {steps.map((step, index) => {
                 const StepIcon = step.icon;
@@ -477,7 +476,7 @@ input[type="radio"]:checked {
             </div>
             
             {/* Copyright Text - At Bottom */}
-            <div className="mt-auto pt-6 text-center text-gray-500 text-sm">
+            <div className="mt-auto pt-6 text-center text-gray-500 text-sm border-t border-gray-200">
               <div className="flex items-center justify-center gap-1">
                 <span>made with</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#f43f5e" stroke="#f43f5e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -498,8 +497,8 @@ input[type="radio"]:checked {
           <div className={`flex-1 p-4 md:p-6 ${!previewOpen ? 'w-full' : ''} overflow-y-auto custom-scrollbar`}>
             <div className="pt-10 md:pt-0">
               <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
-                {/* Step Indicator - Only on larger screens */}
-                <div className="hidden md:block">
+                {/* Step Indicator */}
+                <div>
                   <StepIndicator
                     currentStep={currentStep}
                     totalSteps={steps.length}
