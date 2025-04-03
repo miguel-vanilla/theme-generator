@@ -47,9 +47,4 @@ export const defaultConfig: ThemeConfig = {
   inputBorderColor: '#9ca3af',
   inputFocusColor: '#3b82f6',
   inputFocusBorderWidth: 2,
-  inputBorderWidth: 1,
-  inputBackgroundColor: '#ffffff',
-  inputBorderColor: '#9ca3af',
-  inputFocusColor: '#3b82f6',
-  inputFocusBorderWidth: 2,
 };
